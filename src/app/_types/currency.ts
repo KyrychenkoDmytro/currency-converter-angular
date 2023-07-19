@@ -1,7 +1,5 @@
 export type TCurrencyShortName = string;
 
-
-
 export type TRates = {[key: TCurrencyShortName]: number};
 
 export interface ICurrency {

@@ -1,13 +1,27 @@
 <mat-toolbar color="primary">
-  <mat-toolbar-row>
-    <span>{{'APP_NAME' | translate}}</span>
-    <span class="example-spacer"></span>
-    <button mat-icon-button class="example-icon favorite-icon" aria-label="Example icon-button with heart icon">
-      <mat-icon>price_check</mat-icon>
-    </button>
+  <mat-toolbar-row class="toolbar-row">
+    <div>
+      <span>{{'APP_NAME' | translate}}
+        <mat-icon>price_check</mat-icon></span>
+    </div>
+
+    <div class="currency-container">
+      <ng-container *ngIf="actualFavoriteRates$ | async as actualFavoriteRates; else loader">
+        <span>
+          $ {{actualFavoriteRates['USD']}}
+        </span>
+        <span>
+          € {{actualFavoriteRates['EUR']}}
+        </span>
+      </ng-container>
+    </div>
   </mat-toolbar-row>
 </mat-toolbar>
 
 <section>
   <router-outlet></router-outlet>
 </section>
+
+<ng-template #loader>
+  <mat-spinner color="warn" diameter="30"></mat-spinner>
+</ng-template>

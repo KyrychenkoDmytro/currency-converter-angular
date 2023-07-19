@@ -1,8 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { CurrencyApplicationService } from './_services/currency-application.service';
-import { delay, Subject, switchMap, takeUntil } from 'rxjs';
+import { CurrencyService } from '../_services/currency.service';
+import { delay, distinctUntilChanged, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 import { ICurrency, TCurrencyShortName } from '../_types/currency';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { environment } from '../../enviroments/environment';
 
 @Component({
   selector: 'app-calculator',
@@ -14,35 +15,32 @@ export class CalculatorComponent implements OnInit, OnDestroy {
 
   public primaryForm: FormGroup = this._fb.group({
     value: null,
-    currency: 'UAH'
+    currency: environment.initialPrimaryCurrency
   });
 
   public secondaryForm: FormGroup = this._fb.group({
     value: null,
-    currency: 'USD'
+    currency: environment.initialSecondaryCurrency
   });
 
   private _destroy$: Subject<void> = new Subject<void>();
 
   public constructor(
-    private _currencyApplicationService: CurrencyApplicationService,
+    private _currencyService: CurrencyService,
     private _fb: FormBuilder,
   ) {
   }
 
   public ngOnInit(): void {
-    this._currencyApplicationService.getLatestRates$(
-      this.primaryForm.get('currency')?.value
-    )
+    this._currencyService.actualRateBaseOnSelectedCurrency$
       .pipe(
-        delay(500),
-        takeUntil(this._destroy$)
+        delay(1000),
+        take(1),
+        takeUntil(this._destroy$),
       )
       .subscribe((currencyData: ICurrency) => {
-        console.log(currencyData)
         this.currencyData = currencyData;
       });
-
 
     this.primaryForm.get('value')!.valueChanges
       .pipe(takeUntil(this._destroy$))
@@ -55,8 +53,10 @@ export class CalculatorComponent implements OnInit, OnDestroy {
       });
 
     this.primaryForm.get('currency')!.valueChanges
-      .pipe(switchMap(
-          (currentCurrency: TCurrencyShortName) => this._currencyApplicationService.getLatestRates$(currentCurrency)),
+      .pipe(
+        tap((currentCurrency: TCurrencyShortName) => this._currencyService.loadRates(currentCurrency)),
+        switchMap(() => this._currencyService.actualRateBaseOnSelectedCurrency$),
+        distinctUntilChanged((prev: ICurrency, curr: ICurrency) => prev.base === curr.base),
         takeUntil(this._destroy$)
       )
       .subscribe((currencyData: ICurrency) => {

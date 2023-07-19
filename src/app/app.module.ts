@@ -10,6 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   const href: string = document.querySelector('base')!.href;
@@ -35,6 +36,7 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
         deps: [HttpClient]
       }
     }),
+    MatProgressSpinnerModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

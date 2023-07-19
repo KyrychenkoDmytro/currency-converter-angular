@@ -1,0 +1,27 @@
+<ng-template #loader>
+  <mat-spinner></mat-spinner>
+</ng-template>
+
+<div
+  *ngIf="currencyData; else loader">
+  <app-currency-details
+    [primaryCurrency]="primaryForm.get('currency')?.value"
+    [secondaryCurrency]="secondaryForm.get('currency')?.value"
+    [rate]="currencyData.rates[secondaryForm.get('currency')?.value]"
+  ></app-currency-details>
+
+  <div style="display:flex;gap: 12px; flex-direction: column">
+    <app-currency-control
+      [form]="primaryForm"
+      [currencyData]="currencyData"
+    ></app-currency-control>
+
+    <app-currency-control
+      [form]="secondaryForm"
+      [currencyData]="currencyData"
+    ></app-currency-control>
+  </div>
+</div>
+
+
+
